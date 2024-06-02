@@ -176,11 +176,19 @@ function isMarkerVisible(){
     return markerRoot1.visible;
 }
 
+function getEulerAngles(){
+	let mat = markerControls1.object3d.matrix;
+	let angles = computeEulerAngles(mat.toArray());
+
+	return angles;
+}
+
 return {
     initializeAr,
     animateAr,
     getTextureCanvas,
-    isMarkerVisible
+    isMarkerVisible,
+	getEulerAngles
 }
 
 }()
