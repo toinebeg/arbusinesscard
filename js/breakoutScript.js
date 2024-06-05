@@ -67,7 +67,8 @@ const breakoutScript = function() {
     }
 
     function teardownGame(){
-        state = createInitialState()
+        state = null;
+        state = createInitialState();
         document.removeEventListener("keydown", keyDownHandler, false)
         document.removeEventListener("keyup", keyUpHandler, false)
         document.removeEventListener("mousemove", mouseMoveHandler, false)
@@ -216,8 +217,9 @@ const breakoutScript = function() {
         }
 
         if(state.gameOver || state.gameWon) {
-            state.gameOver ? alert("Game over") : alert("Game won")
-            teardownGame()
+            //state.gameOver ? alert("Game over") : alert("Game won")
+            //teardownGame()
+            console.log({state})
             return
         }
 
@@ -232,11 +234,14 @@ const breakoutScript = function() {
        // requestAnimationFrame(draw)
     }
 
-
+    function isGameRunning() {
+        return !state.gameOver && !state.gameWon
+    }
 
     return {
         setupGame,
         drawGameFrame,
+        isGameRunning
     }
 
 }()

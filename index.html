@@ -30,8 +30,12 @@
 <div id="dataDisplay">
 
 </div>
+<dialog id="gameEndDialog">
+	<p>Game Over</p>
 
-
+	<button>Play Again</button>
+	<button>Home</button>
+</dialog>
 		
 <!-- 
 
@@ -47,8 +51,12 @@
 	}
 
 	function update(){
-		if(arScript.isMarkerVisible()){
+		if(arScript.isMarkerVisible() && breakoutScript.isGameRunning()){
 			breakoutScript.drawGameFrame();
+		}
+		if(!breakoutScript.isGameRunning()){
+			const dialog = document.getElementById("gameEndDialog")
+			dialog.showModal()
 		}
 		arScript.animateAr();
 		requestAnimationFrame(update)
