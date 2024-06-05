@@ -67,6 +67,7 @@ const breakoutScript = function() {
     }
 
     function teardownGame(){
+        state = createInitialState()
         document.removeEventListener("keydown", keyDownHandler, false)
         document.removeEventListener("keyup", keyUpHandler, false)
         document.removeEventListener("mousemove", mouseMoveHandler, false)
