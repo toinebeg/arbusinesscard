@@ -4,9 +4,6 @@ const breakoutScript = function() {
     let canvas; //= document.getElementById("myCanvas")
     let ctx; 
 
-    // FLAGS
-    const useCanvasPerspective = false
-
     // CONSTANTS
     const fillColor = "#0095DD"
     const ballRadius = 10
@@ -19,7 +16,6 @@ const breakoutScript = function() {
     const brickPadding = 10
     const brickOffestTop = 30
     const brickOffsetLeft = 30 
-    const transformConstrain = 20;
 
     // FUNCTIONS 
 
@@ -61,22 +57,22 @@ const breakoutScript = function() {
         canvas = _canvas;
         ctx = canvas.getContext("2d");
         state = createInitialState()
-        document.addEventListener("keydown", keyDownHandler, false)
+/*        document.addEventListener("keydown", keyDownHandler, false)
         document.addEventListener("keyup", keyUpHandler, false)
-        document.addEventListener("mousemove", mouseMoveHandler, false)
+        document.addEventListener("mousemove", mouseMoveHandler, false)*/
     }
 
-    function teardownGame(){
+    function restartGame(){
         state = null;
         state = createInitialState();
-        document.removeEventListener("keydown", keyDownHandler, false)
+        /*document.removeEventListener("keydown", keyDownHandler, false)
         document.removeEventListener("keyup", keyUpHandler, false)
-        document.removeEventListener("mousemove", mouseMoveHandler, false)
+        document.removeEventListener("mousemove", mouseMoveHandler, false)*/
     }
 
     function drawLives(){
         ctx.font = "16px Arial"
-        ctx.fillStyle = "#0095DD"
+        ctx.fillStyle = fillColor
         ctx.fillText(`Lives: ${state.lives}`, canvas.width - 65 , 20)
     }
 
@@ -90,23 +86,9 @@ const breakoutScript = function() {
         }
     }
 
-    function computeTransforms(x, y, el) {
-        let box = el.getBoundingClientRect();
-        let calcX = (y - window.innerHeight / 2) / transformConstrain;
-        let calcY = (x - window.innerWidth / 2) / transformConstrain;
-        
-        return "perspective(100px) "
-            + "   rotateX("+ calcX +"deg) "
-            + "   rotateY("+ calcY +"deg) ";
-    };
-
-    function transformElement(el, xyEl) {
-        el.style.transform  = computeTransforms.apply(null, xyEl);
-    }
-
     function drawScore() {
         ctx.font = "16px Arial"
-        ctx.fillStyle = "#0095DD"
+        ctx.fillStyle = fillColor
         ctx.fillText(`Score: ${state.score}`, 8 , 20)
     }
 
@@ -180,17 +162,15 @@ const breakoutScript = function() {
     }
 
     function drawGameFrame(){
-        if(useCanvasPerspective) {
-            const mouseXY = [...state.mouseXY]
-            const position = mouseXY.concat([canvas])
-            transformElement(canvas, position)
-        }
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         drawBall()
         drawPaddle()
         drawScore()
         drawLives()
         drawBricks()
+
         collisionDetection()
         if(state.x + state.dx > canvas.width - ballRadius || state.x + state.dx < ballRadius) {
             state.dx = -state.dx
@@ -222,7 +202,6 @@ const breakoutScript = function() {
             console.log({state})
             return
         }
-
         if(state.rightPressed) {
             state.paddleX = Math.min(state.paddleX + 7, canvas.width - paddleWidth )
         } else if (state.leftPressed) {
@@ -234,14 +213,38 @@ const breakoutScript = function() {
        // requestAnimationFrame(draw)
     }
 
+    function setPaddleMovementFromAngles(angles) {
+        const threshold = 0.2;
+    
+        if (angles.z > -threshold && angles.z < threshold) {
+            // Central position: stop moving
+            state.leftPressed = false;
+            state.rightPressed = false;
+        } else if (angles.z <= -threshold) {
+            // Move left
+            state.leftPressed = true;
+            state.rightPressed = false;
+        } else if (angles.z >= threshold) {
+            // Move right
+            state.leftPressed = false;
+            state.rightPressed = true;
+        }
+    }
+
     function isGameRunning() {
         return !state.gameOver && !state.gameWon
+    }
+    function getDirection(){
+        return {l : state.leftPressed, r: state.rightPressed}
     }
 
     return {
         setupGame,
         drawGameFrame,
-        isGameRunning
+        isGameRunning,
+        setPaddleMovementFromAngles,
+        getDirection,
+        restartGame
     }
 
 }()

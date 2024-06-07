@@ -23,6 +23,10 @@
 			left: 10px;
 			z-index: 1000;
 		}
+		
+		#goToHome {
+			appearance: button;
+		}
 	</style>
 </head>
 
@@ -30,11 +34,11 @@
 <div id="dataDisplay">
 
 </div>
-<dialog id="gameEndDialog">
-	<p>Game Over</p>
+<dialog id="endGameDialog">
+	<p id="endGameMessage">Game Over</p>
 
-	<button>Play Again</button>
-	<button>Home</button>
+	<button id="playAgain">Play Again</button>
+	<a href="https://toinebeg.dev" id="goToHome">Check my profile</a>
 </dialog>
 		
 <!-- 
@@ -43,20 +47,45 @@
 -->
 
 <script>
+	const debugAngles = true;
+	const dataDisplay = document.getElementById("dataDisplay");
+	const endGameDialog = document.getElementById("endGameDialog")
+
+	function onPlayAgainClicked(){
+		endGameDialog.close();
+		breakoutScript.restartGame();
+
+	}
+
+	function onGoToHomeClicked(){
+
+	}
+
 	function init() {
 		arScript.initializeAr();
 		const textureCanvas = arScript.getTextureCanvas();
 		breakoutScript.setupGame(textureCanvas);
 		requestAnimationFrame(update)
+		document.getElementById("playAgain").addEventListener("click", onPlayAgainClicked);
+		document.getElementById("goToHome").addEventListener("click", onGoToHomeClicked);
+
 	}
 
 	function update(){
+		if(debugAngles && arScript.isMarkerVisible()) {
+			const angles = arScript.getEulerAngles()
+			const dir = breakoutScript.getDirection()
+			dataDisplay.innerHTML = `<p>roll (x) :${angles.x}</p> <p> pitch (y) : ${angles.y}</p> <p>yaw (z) : ${angles.z} </p> <p> l: ${dir.l} r: ${dir.r}</p>`;
+		} else {
+			dataDisplay.innerHTML = "";
+		}
+
 		if(arScript.isMarkerVisible() && breakoutScript.isGameRunning()){
+			breakoutScript.setPaddleMovementFromAngles(arScript.getEulerAngles())
 			breakoutScript.drawGameFrame();
 		}
 		if(!breakoutScript.isGameRunning()){
-			const dialog = document.getElementById("gameEndDialog")
-			dialog.showModal()
+			endGameDialog.showModal()
 		}
 		arScript.animateAr();
 		requestAnimationFrame(update)

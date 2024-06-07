@@ -12,7 +12,6 @@ var markerRoot1, markerControls1;
 
 var mesh1;
 
-const debugAngles = true;
 function initializeAr()
 {
 
@@ -133,7 +132,7 @@ function computeEulerAngles(matrix) {
         z = 0;
     }
 
-    return [x, y, z]; // roll (x), pitch (y), yaw (z)
+    return {x, y, z}; // roll (x), pitch (y), yaw (z)
 }
 
 function update()
@@ -157,12 +156,6 @@ function animateAr()
 	//requestAnimationFrame(animateAr);
 	deltaTime = clock.getDelta();
 	totalTime += deltaTime;
-	if(debugAngles && markerRoot1.visible) {
-		const dataDisplay = document.getElementById("dataDisplay");
-		let mat = markerControls1.object3d.matrix;
-		let angles = computeEulerAngles(mat.toArray())
-		dataDisplay.innerHTML = `<p> roll :${angles[0]}</p> <p> pitch : ${angles[1]}</p> <p>yaw : ${angles[2]} </p>`;
-	}
 	texture.needsUpdate = true;
 	update();
 	render();
